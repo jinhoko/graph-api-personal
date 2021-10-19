@@ -1,0 +1,11 @@
+
+{
+    "authority": "https://login.microsoftonline.com/consumers/?client_id=YOURTENANTIDGOESHERE",
+    "client_id": "",
+
+	"secret_id": "",
+    "secret": "",
+
+	"scope": [ "https://graph.microsoft.com/.default" ],
+	"redirect_uri": "https://login.microsoftonline.com/common/oauth2/nativeclient"
+}

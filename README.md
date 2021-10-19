@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Guidance for **PERSONAL** Microsoft Graph API use (applied only for personal live account).
+Guidance and useful tools for **PERSONAL** Microsoft Graph API use (applied only for personal live account).
 
 ## Functionalities
 
