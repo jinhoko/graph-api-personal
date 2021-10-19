@@ -32,7 +32,7 @@ example =>
 	folder_path = '/Pictures/Me/'
 
 """
-folder_path = '/사진/tester/' 		 # FILLME write here
+folder_path = "/사진/20181026-20181107_VancouverRocky/selected/" # FILLME write here
 sort_by_date_taken = True			# FILLME turn on/off
 
 
@@ -68,7 +68,7 @@ success_count = 0
 if sort_by_date_taken:
 	children = sorted(children, key = (lambda it: it['fileSystemInfo']['createdDateTime']) )
 
-for item in children:
+for idx, item in enumerate(children):
 	if 'image' not in item.keys():	# the file must be a type of image
 		continue
 	image_count += 1
@@ -76,8 +76,8 @@ for item in children:
 	query = drivebaselink + f"items/{itemid}/thumbnails"
 	response = requests.get( query, headers=header).json()
 
-	print(json.dumps(item))
-	print("response: \n%s" % json.dumps(response, indent=2))
+	#print(json.dumps(item))
+	#print("response: \n%s" % json.dumps(response, indent=2))
 
 	if 'value' not in response.keys(): # failure
 		print("embed failed for file id "+ itemid)
@@ -92,7 +92,7 @@ for item in children:
 	tmp = re.sub(pattern='\?width\=[0-9]+', repl=f'?width={width}', string=largelink)	
 	originallink = re.sub(pattern='height=[0-9]+', repl=f'height={height}', string=tmp)		# original size
 
-	result.append( (originallink, largelink) )
+	result.append( (idx, originallink, largelink) )
 	success_count += 1
 
 print("\n\nDone.")
