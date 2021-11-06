@@ -7,26 +7,39 @@ import re
 with open('private.json', 'r') as f:
 	config = json.load(f)
 
+"""
+Update graph api token
+"""
 # load token
 with open('token', 'rb') as f:
 	token = pickle.load(f)
-
 # refresh token
 refresh_data = { 'grant_type': 'refresh_token',
             'client_id': config['client_id'],
             'refresh_token': token['refresh_token'] }
 response = requests.post('https://login.microsoftonline.com/consumers/oauth2/v2.0/token', data=refresh_data)
-# print(response.headers)
-# print(response.content)
-# exit(0)
 response = response.json()
 token['id_token'] = response['id_token']
 token['access_token'] = response['access_token']
 token['refresh_token'] = response['refresh_token']  # replace access/refresh token
-
 # save token
 with open('token', 'wb') as f:
 	pickle.dump(token, f)
+
+"""
+Update personal onedrive api
+"""
+# TODO need to handle here
+with open('onedrive_token', 'rb') as f:
+	onedrive_token = pickle.load(f)
+response = requests.get(f"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={ config['client_id'] }&response_type=id_token")
+print(response.content)
+response = response.json()
+print(response)
+# save token
+with open('onedrive_token', 'wb') as f:
+	pickle.dump(onedrive_token, f)
+
 
 
 """
