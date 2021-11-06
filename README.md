@@ -21,7 +21,7 @@ Guidance and useful tools for **PERSONAL** Microsoft Graph API use (applied only
 
    1. In `secrets` tab, make secrets. Leave memo of id and value somewhere else.
    2. In `authorization` tab, Add platform for `mobile and desktop application`. Check `https://login.microsoftonline.com/common/oauth2/nativeclient` as redirection URI.
-   3. In `API permissions` tab, add some permissions, especially `Files.XXX`.
+   3. In `API permissions` tab, add some permissions, especially `Files.XXX` and `Sites.XXX`.
 
 2. Write `private.json` by referring `private.json.template`.
 	- `authority` : tenant ID

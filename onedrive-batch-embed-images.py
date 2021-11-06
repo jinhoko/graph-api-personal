@@ -15,7 +15,12 @@ with open('token', 'rb') as f:
 refresh_data = { 'grant_type': 'refresh_token',
             'client_id': config['client_id'],
             'refresh_token': token['refresh_token'] }
-response = requests.post('https://login.microsoftonline.com/consumers/oauth2/v2.0/token', data=refresh_data).json()
+response = requests.post('https://login.microsoftonline.com/consumers/oauth2/v2.0/token', data=refresh_data)
+# print(response.headers)
+# print(response.content)
+# exit(0)
+response = response.json()
+token['id_token'] = response['id_token']
 token['access_token'] = response['access_token']
 token['refresh_token'] = response['refresh_token']  # replace access/refresh token
 
@@ -34,6 +39,7 @@ example =>
 """
 folder_path = "/사진/20181026-20181107_VancouverRocky/selected/" # FILLME write here
 sort_by_date_taken = True			# FILLME turn on/off
+my_live_email = "ben4945@live.co.kr"		# FILLME
 
 
 """"""""""""""
@@ -47,7 +53,14 @@ header = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
 }
-drivebaselink = "https://graph.microsoft.com/v1.0/me/drive/"
+header_wo_token = {
+		'Authorization': 'Bearer ' + token['id_token'],
+		'Accept': 'application/json',
+        'Content-Type': 'application/json'
+}
+
+drivebaselink = f"https://graph.microsoft.com/v1.0/users('${my_live_email}')/drive/"
+tmplink = "https://api.onedrive.com/v1.0/drives/users('AE393D5A0949D378')/"
 
 # get folder id
 query = drivebaselink + "root:" + folder_path
@@ -61,23 +74,31 @@ query = drivebaselink + f"items/{folder_id}/children"
 childrendata = requests.get( query, headers=header, stream=False ).json()
 children = childrendata['value']
 
+if sort_by_date_taken:
+	children = sorted(children, key = (lambda it: it['fileSystemInfo']['createdDateTime']) )
+
 result = []
 image_count = 0
 success_count = 0
-
-if sort_by_date_taken:
-	children = sorted(children, key = (lambda it: it['fileSystemInfo']['createdDateTime']) )
 
 for idx, item in enumerate(children):
 	if 'image' not in item.keys():	# the file must be a type of image
 		continue
 	image_count += 1
-	itemid = item['id']
-	query = drivebaselink + f"items/{itemid}/thumbnails"
-	response = requests.get( query, headers=header).json()
-
 	#print(json.dumps(item))
-	#print("response: \n%s" % json.dumps(response, indent=2))
+	itemid = item['id']
+
+	# TODO access with api.onedrive..
+		#https://euryale.tistory.com/88?category=225967
+		# https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-implicit-grant-flow
+
+	# get link
+	query = tmplink + f"items/{itemid}/thumbnails"
+	response = requests.get( query, headers=header)
+	print(response.headers)
+	print("response: \n%s" % json.dumps(response.json(), indent=2))
+
+	exit(0)
 
 	if 'value' not in response.keys(): # failure
 		print("embed failed for file id "+ itemid)
@@ -98,7 +119,7 @@ for idx, item in enumerate(children):
 print("\n\nDone.")
 print(f"{ success_count} images embeded out of {image_count} images in the folder\n")
 
-# print(result)
+print(result)
 output_filename = 'batch-embed-links.pickle'
 with open(output_filename, 'wb') as f:
 	pickle.dump(result, f)
